@@ -1,78 +1,107 @@
 package primes
 
+import "fmt"
 
-var numList []bool
-var primeLimst []int
-var topPrime = 2
-var nonPrimeFactorList [][][]int
-var limit = 10000000
-var topLimit = 10000000000
+var c *calculator
 
 func init() {
-	numList = make([]bool, limit)
-	/*
-	Non-Primes are true in the numList. This is because this algo finds
-	primes by sifting out all the non primes, and the default bool in golang is false
-	 */
-	numList[0] = true
-	numList[1] = true
-	nonPrimeFactorList = make([][][]int, 1)
-	nonPrimeFactorList[0] = make([][]int, 1)
+	c = NewPrimeCalcualtor(0)
+}
+
+type (
+	calculator struct {
+		numberList []bool
+		primeList []int
+		highestPrime int
+		internalLimit int
+		currentLevel int
+	}
+)
+
+func NewPrimeCalcualtor(limit int) *calculator {
+
+	internalLimit := 10000000
+	numberList := make([]bool, internalLimit )
+	numberList[0] = true //true means not prime in this system
+	numberList[1] = true
+
 	primeList := make([]int, 1)
 	primeList[0] = 2
+
+	highestPrime := 2
+
+	c := calculator{numberList: numberList, primeList: primeList, highestPrime: highestPrime,
+		internalLimit: internalLimit, currentLevel: 2}
+	/*TODO: the limit doesn't work right now, it just calcs to the internal limit,
+	 make this iterative. */
+	c.eliminateNonPrimes(0)
+
+	return &c
 }
 
 func IsPrime(x int) bool {
-	if x < topPrime {
-		return !numList[x]
-	}
-	if x > limit && x < topLimit{
-		increaseLimit(x)
-	}
-	findPrimes(x)
-	return !numList[x]
+	return c.isPrime(x)
 }
 
-func increaseLimit(x int) {
-	if x + 10000 < topLimit {
-		numList = append(numList, make([]bool, x - limit + 10000)...)
-		limit = x + 10000
-	} else {
-		numList = append(numList, make([]bool, topLimit - limit)...)
-		limit = topLimit
+func (c *calculator) isPrime(x int) bool {
+	if x < c.internalLimit {
+		return !c.numberList[x]
 	}
+	fmt.Println("!!!!ERROR!!!!", x, "is not inbounds")
+	return false
+
 }
 
-func findPrimes(x int) {
-	calcNonPrimes(x)
+func (c *calculator) FindPrimes(limit int) []int {
+	c.eliminateNonPrimes(limit)
+	return c.primeList
 }
 
-func calcNonPrimes(x int) {
-	topLevel := topLevelNeeded(x)
-	for len(nonPrimeFactorList)-1 < topLevel {
-		nonPrimeFactorList[len(nonPrimeFactorList)-1] = make([][]int, 1)
-	}
+func FindPowerOfTwo(power int) int {
+	num := 2
 
-	for x > topPrime {
-		for level := 2; level < len(nonPrimeFactorList)-1; level++ {
-			advanceMultiples(x, level)
+	for i := 2; i <= power; i++  {
+		num *= 2
+	}
+	return num
+}
+
+func (c *calculator) eliminateNonPrimes(limit int) {
+	for {
+		for index, prime := range c.primeList {
+			c.eliminate(index, prime, 2)
 		}
-		collectPrimes()
+		if !c.findNextPrime() {
+			return
+		} else {
+			c.currentLevel++
+		}
 	}
 }
 
-func advanceMulitples()
-
-func topLevelNeeded(x int) int {
-	power_of_two := 4
-	count := 2
-	for x > power_of_two {
-		power_of_two *= 2
-		count++
+func (c *calculator) eliminate(index, multiplier, level int) {
+	for i := index; i < len(c.primeList); i++ {
+		x := multiplier * c.primeList[i]
+		if x < c.internalLimit {
+			c.numberList[x] = true
+			if level < c.currentLevel {
+				c.eliminate(i, x, level+1)
+			}
+		} else {
+			return
+		}
 	}
-	return count
 }
 
-func advanceMultiples(x, level int) {
-
+func (c *calculator) findNextPrime() bool{
+ 	highestPossiblePrime := FindPowerOfTwo(c.currentLevel)
+	result := false
+	for i := c.highestPrime + 1; i < highestPossiblePrime && i < c.internalLimit; i++ {
+		if c.numberList[i] == false {
+			c.primeList = append(c.primeList, i)
+			c.highestPrime = i
+			result = true
+		}
+	}
+	return result
 }

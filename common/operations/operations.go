@@ -201,14 +201,6 @@ func Permutations(digits []int ) []int {
 	return result
 }
 
-func Combinations(digits []int, choose int) [][]int {
-	result := make([][]int, 0)
-	for i := 0; i < choose; i++ {
-		for j := 0; j < len(digits); j++ {
-			result[i][j] := append(result[i][j], digits)
-		}
-	}
-}
 
 func IntPow10(num, powOfTen int) int {
 

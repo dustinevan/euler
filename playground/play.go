@@ -2,29 +2,26 @@ package main
 
 import (
 	"fmt"
+	"github.com/dustinevan/euler/common/primes"
+	"time"
+	//"github.com/dustinevan/euler/common/operations"
 )
 
 
 func main() {
-	nums := [4]int8{1,2,3,4}
-	comb := make([][]int, 0)
-	for x := 0; x < 3; x++ {
 
-		for y := 0; y < len(nums); y++ {
+	now := time.Now()
+	c := primes.NewPrimeCalcualtor(100)
+	new := c.FindPrimes(1)
+	elapsed := time.Since(now)
+	fmt.Println(elapsed)
 
-			i := x*len(nums)+y
-			fmt.Println(i)
-			if len(comb) < i+1 {
-				comb = append(comb, make([]int8, 0))
-			}
-			comb[i] = append(comb[i], nums[y])
+	/*now = time.Now()
+	old := operations.GetAllPrimesBelow(1000000)
+	elapsed = time.Since(now)*/
 
-
-		}
-	}
-	fmt.Println(comb, nums)
-
-
+	fmt.Println(elapsed, len(new))
+	//fmt.Println(len(new), len(old))
 }
 
 
