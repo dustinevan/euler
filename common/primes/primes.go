@@ -20,7 +20,7 @@ type (
 
 func NewPrimeCalcualtor(limit int) *calculator {
 
-	internalLimit := 10000000
+	internalLimit := 1000000000
 	numberList := make([]bool, internalLimit )
 	numberList[0] = true //true means not prime in this system
 	numberList[1] = true
@@ -35,7 +35,7 @@ func NewPrimeCalcualtor(limit int) *calculator {
 	/*TODO: the limit doesn't work right now, it just calcs to the internal limit,
 	 make this iterative. */
 	c.eliminateNonPrimes(0)
-
+	fmt.Println("Primes Done! Found all primes to ", internalLimit)
 	return &c
 }
 
